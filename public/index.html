@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      {{ message }}
+      <div v-if="display">
+        <button @click="start">Start</button>
+        <button @click="end">Konec</button>
+      </div>
+      <div v-if="visible">
+        <div>
+          {{ questions[0] }}
+          <select v-model="selected_one">
+            <option></option>
+            <option class="question_one_option">{{ answers_q_one[0] }}</option>
+            <option class="question_one_option">{{ answers_q_one[1] }}</option>
+          </select>
+        </div>
+        <div v-if="selected_one != ''">
+          {{ questions[1] }}
+          <select v-model="selected_two">
+            <option></option>
+            <option class="question_second_option">
+              {{ answers_q_two[0] }}
+            </option>
+            <option class="question_second_option">
+              {{ answers_q_two[1] }}
+            </option>
+          </select>
+        </div>
+        <div v-if="selected_two != ''">
+          {{ questions[2] }}
+          <select v-model="selected_three">
+            <option></option>
+            <option class="question_third_option">
+              {{ answers_q_three[0] }}
+            </option>
+            <option class="question_third_option">
+              {{ answers_q_three[1] }}
+            </option>
+          </select>
+        </div>
+        <div v-if="selected_three != ''">
+          {{ questions[3] }}
+          <select v-model="selected_four">
+            <option></option>
+            <option class="bonus_question_option">
+              {{ answers_q_four[0] }}
+            </option>
+            <option class="bonus_question_option">
+              {{ answers_q_four[1] }}
+            </option>
+          </select>
+        </div>
+        <div v-if="reset_button">
+          <button @click="reset">Reset</button>
+        </div>
+        <div
+          v-if="(selected_one!='') && (selected_two!='') && (selected_three!='') && (selected_four!='')"
+        >
+          <button @click="checkAnswers">Vyhodnotit</button>
+        </div>
+      </div>
+      <div v-if="new_message != ''">
+        <span>{{ new_message }}</span>
+        <span>Špatné odpovědi: {{ wrong_answers.length }}</span>
+        <span>Správné odpovědi: {{ your_right_answers.length }}</span>
+        <span>Tvá úspěšnost: {{ percentil }}%</span>
+      </div>
+    </div>
+
+    <script>
+      const vm = new Vue({
+        el: '#app',
+        data: {
+          message: 'Vítej v dnešním kvízu! Můžeme začít?',
+          questions: [
+            'Která herní konzole byla vytvořena dříve?',
+            'Jak se jmenoval plešatý strýček z Addams Family?',
+            'Kolik dílů mají Avengers?',
+            'Ošemetná otázka... Marvel nebo DC?',
+          ],
+          answers_q_one: ['PS', 'XBox'],
+          answers_q_two: ['Tester', 'Fester'],
+          answers_q_three: ['5', '4'],
+          answers_q_four: ['Dycky Marvel!', 'Dycky DC!'],
+          right_answers: ['PS', 'Fester', '4', 'Dycky Marvel!'],
+          your_answers: [],
+          your_right_answers: [],
+          wrong_answers: [],
+          visible: false,
+          display: true,
+          check_button: false,
+          selected_one: '',
+          selected_two: '',
+          selected_three: '',
+          selected_four: '',
+          new_message: '',
+          reset_button: false,
+          percentil: 100,
+        },
+        methods: {
+          start() {
+            this.message = 'Jdeme na to!';
+            this.visible = true;
+            this.display = false;
+            this.check_button = true;
+            this.reset_button = true;
+          },
+          end() {
+            this.message = 'Měj se hezky :)';
+            this.visible = false;
+            this.display = false;
+          },
+          reset() {
+            this.selected_one = '';
+            this.selected_two = '';
+            this.selected_three = '';
+            this.selected_four = '';
+          },
+          checkAnswers() {
+            //PŘIDÁNÍ ODPOVĚDÍ DO POLE A DELETE STÁVAJÍCÍHO OBSAHU
+            this.your_answers.push(
+              this.selected_one,
+              this.selected_two,
+              this.selected_three,
+              this.selected_four
+            );
+            this.visible = false;
+            this.reset_button = false;
+            this.message = '';
+            //POROVNÁVÁNÍ OBOU ARRAYS A ROZDĚLENÍ ODPOVĚDÍ DO ARRAYS
+            if (
+              JSON.stringify(this.right_answers) ===
+              JSON.stringify(this.your_answers)
+            ) {
+              this.your_right_answers = this.right_answers;
+              this.new_message =
+                'Máš vše správně :) Počet otázek bylo: ' +
+                this.questions.length;
+            }
+            if (
+              JSON.stringify(this.right_answers) !==
+              JSON.stringify(this.your_answers)
+            ) {
+              if (this.right_answers.includes(this.selected_one)) {
+                this.your_right_answers.push(this.selected_one);
+              } else {
+                this.wrong_answers.push(this.selected_one);
+                this.percentil = this.percentil - 25;
+              }
+              if (this.right_answers.includes(this.selected_two)) {
+                this.your_right_answers.push(this.selected_two);
+              } else {
+                this.wrong_answers.push(this.selected_two);
+                this.percentil = this.percentil - 25;
+              }
+              if (this.right_answers.includes(this.selected_three)) {
+                this.your_right_answers.push(this.selected_three);
+              } else {
+                this.wrong_answers.push(this.selected_three);
+                this.percentil = this.percentil - 25;
+              }
+              if (this.right_answers.includes(this.selected_four)) {
+                this.your_right_answers.push(this.selected_four);
+              } else {
+                this.wrong_answers.push(this.selected_four);
+                this.percentil = this.percentil - 25;
+              }
+              this.new_message =
+                'Máš tam chybu. Počet otázek bylo: ' + this.questions.length;
+            }
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
