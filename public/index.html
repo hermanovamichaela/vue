@@ -16,63 +16,23 @@
         <button @click="end">Konec</button>
       </div>
       <div v-if="visible">
-        <div>
-          {{ questions[0] }}
-          <select v-model="selected_one">
-            <option></option>
-            <option class="question_one_option">{{ answers_q_one[0] }}</option>
-            <option class="question_one_option">{{ answers_q_one[1] }}</option>
-          </select>
+        <div v-for="(question, index) in questions">
+          <div v-if="index === current_question">
+            {{ question.question }}
+            <select v-model="question.user_answer">
+              <option ></option>
+              <option v-for="answer in question.answers" class="question_one_option">{{ answer }}</option>
+            </select>
+          </div>
         </div>
-        <div v-if="selected_one != ''">
-          {{ questions[1] }}
-          <select v-model="selected_two">
-            <option></option>
-            <option class="question_second_option">
-              {{ answers_q_two[0] }}
-            </option>
-            <option class="question_second_option">
-              {{ answers_q_two[1] }}
-            </option>
-          </select>
-        </div>
-        <div v-if="selected_two != ''">
-          {{ questions[2] }}
-          <select v-model="selected_three">
-            <option></option>
-            <option class="question_third_option">
-              {{ answers_q_three[0] }}
-            </option>
-            <option class="question_third_option">
-              {{ answers_q_three[1] }}
-            </option>
-          </select>
-        </div>
-        <div v-if="selected_three != ''">
-          {{ questions[3] }}
-          <select v-model="selected_four">
-            <option></option>
-            <option class="bonus_question_option">
-              {{ answers_q_four[0] }}
-            </option>
-            <option class="bonus_question_option">
-              {{ answers_q_four[1] }}
-            </option>
-          </select>
-        </div>
-        <div v-if="reset_button">
-          <button @click="reset">Reset</button>
-        </div>
-        <div
-          v-if="(selected_one!='') && (selected_two!='') && (selected_three!='') && (selected_four!='')"
-        >
-          <button @click="checkAnswers">Vyhodnotit</button>
-        </div>
+    
+        <button v-if="current_question < questions.length - 1" @click="next" :disabled="!questions[current_question].user_answer">Next</button>
+        <button v-if="current_question === questions.length - 1" @click="checkAnswers">Vyhodnotit</button>
+        <button @click="reset">Reset</button>
       </div>
-      <div v-if="new_message != ''">
-        <span>{{ new_message }}</span>
+      <div v-if="results">
         <span>Špatné odpovědi: {{ wrong_answers.length }}</span>
-        <span>Správné odpovědi: {{ your_right_answers.length }}</span>
+        <span>Správné odpovědi: {{ questions.length - wrong_answers.length }}</span>
         <span>Tvá úspěšnost: {{ percentil }}%</span>
       </div>
     </div>
@@ -83,29 +43,37 @@
         data: {
           message: 'Vítej v dnešním kvízu! Můžeme začít?',
           questions: [
-            'Která herní konzole byla vytvořena dříve?',
-            'Jak se jmenoval plešatý strýček z Addams Family?',
-            'Kolik dílů mají Avengers?',
-            'Ošemetná otázka... Marvel nebo DC?',
-          ],
-          answers_q_one: ['PS', 'XBox'],
-          answers_q_two: ['Tester', 'Fester'],
-          answers_q_three: ['5', '4'],
-          answers_q_four: ['Dycky Marvel!', 'Dycky DC!'],
-          right_answers: ['PS', 'Fester', '4', 'Dycky Marvel!'],
-          your_answers: [],
-          your_right_answers: [],
-          wrong_answers: [],
-          visible: false,
+                {
+                  question: 'Která herní konzole byla vytvořena dříve?',
+                  answers: ['PS', 'XBox'],
+                  correct_answer: 'PS',
+                  user_answer: ''
+                },
+                {
+                  question: 'Jak se jmenoval plešatý strýček z Addams Family?',
+                  answers: ['Tester', 'Fester'],
+                  correct_answer: 'Fester',
+                  user_answer: ''
+                },
+                {
+                  question: 'Kolik dílů mají Avengers?',
+                  answers: ['5', '4'],
+                  correct_answer: '4',
+                  your_answer: ''
+                },
+                {
+                  question: 'Ošemetná otázka... Marvel nebo DC?',
+                  answers: ['Dycky DC!', 'Dycky Marvel!'],
+                  correct_answer: 'Dycky Marvel!',
+                  your_answer: ''
+                }
+              ],    
+          current_question: 0,
           display: true,
-          check_button: false,
-          selected_one: '',
-          selected_two: '',
-          selected_three: '',
-          selected_four: '',
-          new_message: '',
-          reset_button: false,
-          percentil: 100,
+          visible: false,
+          results: false,
+          wrong_answers: [],
+          percentil: 0
         },
         methods: {
           start() {
@@ -120,63 +88,36 @@
             this.visible = false;
             this.display = false;
           },
+          next() {
+            this.current_question++;
+          },
           reset() {
-            this.selected_one = '';
-            this.selected_two = '';
-            this.selected_three = '';
-            this.selected_four = '';
+            this.current_question = 0;
+            this.wrong_answers = [];
           },
           checkAnswers() {
             //PŘIDÁNÍ ODPOVĚDÍ DO POLE A DELETE STÁVAJÍCÍHO OBSAHU
-            this.your_answers.push(
-              this.selected_one,
-              this.selected_two,
-              this.selected_three,
-              this.selected_four
-            );
             this.visible = false;
-            this.reset_button = false;
+            this.results = true;
             this.message = '';
-            //POROVNÁVÁNÍ OBOU ARRAYS A ROZDĚLENÍ ODPOVĚDÍ DO ARRAYS
-            if (
-              JSON.stringify(this.right_answers) ===
-              JSON.stringify(this.your_answers)
-            ) {
-              this.your_right_answers = this.right_answers;
-              this.new_message =
-                'Máš vše správně :) Počet otázek bylo: ' +
-                this.questions.length;
-            }
-            if (
-              JSON.stringify(this.right_answers) !==
-              JSON.stringify(this.your_answers)
-            ) {
-              if (this.right_answers.includes(this.selected_one)) {
-                this.your_right_answers.push(this.selected_one);
-              } else {
-                this.wrong_answers.push(this.selected_one);
-                this.percentil = this.percentil - 25;
-              }
-              if (this.right_answers.includes(this.selected_two)) {
-                this.your_right_answers.push(this.selected_two);
-              } else {
-                this.wrong_answers.push(this.selected_two);
-                this.percentil = this.percentil - 25;
-              }
-              if (this.right_answers.includes(this.selected_three)) {
-                this.your_right_answers.push(this.selected_three);
-              } else {
-                this.wrong_answers.push(this.selected_three);
-                this.percentil = this.percentil - 25;
-              }
-              if (this.right_answers.includes(this.selected_four)) {
-                this.your_right_answers.push(this.selected_four);
-              } else {
-                this.wrong_answers.push(this.selected_four);
-                this.percentil = this.percentil - 25;
-              }
-              this.new_message =
-                'Máš tam chybu. Počet otázek bylo: ' + this.questions.length;
+            
+            const wrongAnswers = [];
+            const count = this.questions.length;
+
+          for (let i = 0; i < count; i++) {
+            if (this.questions[i].user_answer !== this.questions[i].correct_answer) {
+                wrongAnswers.push(this.questions[i]);
+             }
+          }
+
+          this.wrong_answers = wrongAnswers;
+
+            if (wrongAnswers.length === 0) {
+                  console.log("Vše správně");
+            } else if (wrongAnswers.length !== count) {
+                    console.log("Něco špatne");
+            } else {
+                    console.log("Jsi looser!");
             }
           },
         },
