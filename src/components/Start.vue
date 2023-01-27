@@ -4,7 +4,7 @@
     <button @click="start">Start</button>
     <button @click="end">Konec</button>
   </div>
-  <questions v-if="visible"></questions>
+  <questions v-if="visible" :questions="questions"></questions>
 </template>
 
 <script>
@@ -13,6 +13,7 @@
   export default {
     name: 'Start',
     components: { Questions },
+    props:['questions'], 
     data() {
       return {
         message: 'Vítej v dnešním kvízu! Můžeme začít?',
@@ -24,17 +25,12 @@
     },
     methods: {
       start() {
-        this.message = 'Jdeme na to!';
+        this.message = '';
         this.visible = true;
         this.display = false;
         this.check_button = true;
         this.reset_button = true;
-      },
-      end() {
-        this.message = 'Měj se hezky :)';
-        this.visible = false;
-        this.display = false;
-      },
+      }
     }
   };
 </script>
