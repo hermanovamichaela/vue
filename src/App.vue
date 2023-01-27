@@ -1,19 +1,16 @@
 <template>
-  <div></div>
-  <start></start>
-  <questions></questions>
-  <end :questions="questions" :otherVariables="otherVariables"></end>
+  <div>
+      <start></start>
+  </div>
 </template>
 
 <script>
-  import Start from './components/Start.vue'
-  import Questions from './components/Questions.vue'
-  import End from './components/End.vue'
+
+  import Start from './components/Start.vue';
 
   export default {
     name: 'App',
-    components: { Start, Questions, End },
-    message: 'Vítej v dnešním kvízu! Můžeme začít?',
+    components: { Start },
     questions: [
       {
         question: 'Která herní konzole byla vytvořena dříve?',
@@ -39,12 +36,7 @@
         correct_answer: 'Dycky Marvel!',
         your_answer: '',
       }
-    ],
-    visible: false,
-    display: true,
-    check_button: false,
-    reset_button: false,
-    wrong_answers: []
+    ]
   }
 
 

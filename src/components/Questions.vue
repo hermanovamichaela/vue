@@ -30,22 +30,31 @@
     </button>
     <button @click="reset">Reset</button>
   </div>
+  <end :questions="questions"></end>
 </template>
 
 <script>
+  import End from './End.vue';
+
   export default {
     name: 'Questions',
-    props: ['questions','wrong_answers'],
-    current_question: 0
-  };
-
-  function next() {
-    this.current_question++;
-  };
-
-  function reset() {
-    this.current_question = 0;
-    this.wrong_answers = [];
+    components: { End },
+    data() {
+      return {
+        current_question: 0,
+        wrong_answers: [],
+        props: ['questions'],
+      }
+    },
+    methods: {
+      next() {
+        this.current_question++;
+      },
+      reset() {
+        this.current_question = 0;
+        this.wrong_answers = [];
+      }
+    }
   };
 
 </script>

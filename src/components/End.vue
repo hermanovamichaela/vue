@@ -24,34 +24,39 @@
 export default {
   name: 'End',
   props: ['questions','wrong_answers','visible','message'],
-  result: false
-};
-
-function checkAnswers() {
-  this.visible = false;
-  this.results = true;
-  this.message = '';
-
-  const wrongAnswers = [];
-  const count = this.questions.length;
-
-  for (let i = 0; i < count; i++) {
-    if (this.questions[i].user_answer !== this.questions[i].correct_answer) {
-      wrongAnswers.push(this.questions[i]);
+  data() {
+    return {
+        result: false
     }
-  }
+  },
+  methods: {
+    checkAnswers() {
+      this.visible = false;
+      this.results = true;
+      this.message = '';
 
-  this.wrong_answers = wrongAnswers;
-  this.percentil =
-    ((this.questions.length - this.wrong_answers.length) /
-      this.questions.length) *
-    100;
-  if (wrongAnswers.length === 0) {
-    console.log('Vše správně');
-  } else if (wrongAnswers.length !== count) {
-    console.log('Něco je špatne');
-  } else {
-    console.log('Jsi looser!');
+      const wrongAnswers = [];
+      const count = this.questions.length;
+
+      for (let i = 0; i < count; i++) {
+        if (this.questions[i].user_answer !== this.questions[i].correct_answer) {
+          wrongAnswers.push(this.questions[i]);
+        }
+      }
+
+      this.wrong_answers = wrongAnswers;
+      this.percentil =
+        ((this.questions.length - this.wrong_answers.length) /
+          this.questions.length) *
+        100;
+      if (wrongAnswers.length === 0) {
+        console.log('Vše správně');
+      } else if (wrongAnswers.length !== count) {
+        console.log('Něco je špatne');
+      } else {
+        console.log('Jsi looser!');
+      }
+    }
   }
 }
 </script>
