@@ -9,11 +9,7 @@
 <script>
   export default {
     name: 'Start',
-    message: 'Vítej v dnešním kvízu! Můžeme začít?',
-    visible: false,
-    display: true,
-    check_button: false,
-    reset_button: false
+    props: ['display','check_button','reset_button','visible']
   };
 
   function start() {

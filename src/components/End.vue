@@ -1,13 +1,13 @@
 <template>
   <button
-    v-if="current_question < questions.length - 1"
+    v-if="questions && current_question < questions.length - 1"
     @click="next"
     :disabled="!questions[current_question].user_answer"
   >
     Next
   </button>
   <button
-    v-if="current_question === questions.length - 1"
+    v-if="questions && current_question === questions.length - 1"
     @click="checkAnswers"
   >
     Vyhodnotit
@@ -21,16 +21,10 @@
 </template>
 
 <script>
-import Questions from './Questions.vue';
-
 export default {
   name: 'End',
-  components: {
-    Questions,
-  },
-  visible: true,
-  result: false,
-  message: '',
+  props: ['questions','wrong_answers','visible','message'],
+  result: false
 };
 
 function checkAnswers() {
